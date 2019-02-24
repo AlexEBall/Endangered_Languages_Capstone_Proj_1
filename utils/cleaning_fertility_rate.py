@@ -11,19 +11,17 @@ needed_data = ['Country Name', 'Country Code',
 fertility_rate_df = fertility_rate_df[needed_data]
 fertility_rate_df.set_index('Country Name', inplace=True)
 
-""" Finding the average fertility rate for all countries """
-# Should I make a copy here?
+""" TODO: Should I make a copy here? """
 # fertility_rate_df_average = fertility_rate_df.copy()
 # fertility_rate_df_average['Fertility Rate Avg'] = fertility_rate_df_average.mean(numeric_only=True, axis=1)
 fertility_rate_df['Fertility Rate Avg'] = fertility_rate_df.mean(
     numeric_only=True, axis=1)
 
-""" Find and drop rows that don't have a fertility rate mean value """
+# Find and drop rows that don't have a fertility rate mean value 
 missing_mean = fertility_rate_df['Fertility Rate Avg'].isnull()
 not_missing_mean = fertility_rate_df['Fertility Rate Avg'].notnull()
 fertility_rate_df = fertility_rate_df[not_missing_mean]
 
-""" Create another data set to merge with endangered languages """
 fr_to_merge = fertility_rate_df[['Country Code', 'Fertility Rate Avg']]
 
 fertility_rate_df.to_csv('./data_sets/Fertility_Rate_Clean.csv')
