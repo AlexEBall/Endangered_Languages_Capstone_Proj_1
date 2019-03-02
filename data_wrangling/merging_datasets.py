@@ -22,4 +22,6 @@ final = pd.merge(together_cleaner, together2_minus_dups,
 endangered_lang_potential_final = final.drop(['Country', 'Country Name', 'ISO-alpha3 code'], axis=1)
 endangered_lang_potential_final = endangered_lang_potential_final.dropna(axis=0, subset=['Language'])
 
-endangered_lang_potential_final.to_csv('./data_sets/endangered_languages_potential_final.csv')
+# figured out how to get rid of the the 'Unnamed: 0' column
+endangered_lang_potential_final.to_csv(
+    './data_sets/endangered_languages_potential_final.csv', index=False)
