@@ -111,4 +111,20 @@ for style in ['white', 'dark', 'whitegrid', 'darkgrid', 'ticks']:
     plt.show()
 
 
+# adding to sns plots
+
+fig, ax = plt.subplots()
+sns.distplot(df['Tuition'], ax=ax)
+ax.set(xlabel="Tuition 2013-14",
+       ylabel="Distribution", xlim=(0, 50000),
+       title="2013-14 Tuition and Fees Distribution")
+
+fig, (ax0, ax1) = plt.subplots(nrows=1, ncols=2,
+                               sharey=True, figsize=(7, 4))
+sns.distplot(df['Tuition'], ax=ax0)
+sns.distplot(df.query('State == "MN"')['Tuition'], ax=ax1)
+ax1.set(xlabel="Tuition (MN)", xlim=(0, 70000))
+ax1.axvline(x=20000, label='My Budget', linestyle='--')
+ax1.legend()
+
 
