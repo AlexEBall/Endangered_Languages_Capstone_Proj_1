@@ -128,3 +128,105 @@ ax1.axvline(x=20000, label='My Budget', linestyle='--')
 ax1.legend()
 
 
+# USA map
+# import plotly.graph_objs as go
+
+df = pd.read_csv('./data_sets/2014_us_cities.csv')
+df.head()
+
+df['text'] = df['name'] + '<br>Population ' + \
+    (df['pop']/1e6).astype(str)+' million'
+limits = [(0, 2), (3, 10), (11, 20), (21, 50), (50, 3000)]
+colors = ["rgb(0,116,217)", "rgb(255,65,54)", "rgb(133,20,75)",
+          "rgb(255,133,27)", "lightgrey"]
+cities = []
+scale = 5000
+
+for i in range(len(limits)):
+    lim = limits[i]
+    df_sub = df[lim[0]:lim[1]]
+    city = go.Scattergeo(
+        locationmode='USA-states',
+        lon=df_sub['lon'],
+        lat=df_sub['lat'],
+        text=df_sub['text'],
+        marker=go.scattergeo.Marker(
+            size=df_sub['pop']/scale,
+            color=colors[i],
+            line=go.scattergeo.marker.Line(
+                width=0.5, color='rgb(40,40,40)'
+            ),
+            sizemode='area'
+        ),
+        name='{0} - {1}'.format(lim[0], lim[1]))
+    cities.append(city)
+
+layout = go.Layout(
+    title=go.layout.Title(
+        text='2014 US city populations<br>(Click legend to toggle traces)'
+    ),
+    showlegend=True,
+    geo=go.layout.Geo(
+        scope='usa',
+        projection=go.layout.geo.Projection(
+            type='albers usa'
+        ),
+        showland=True,
+        landcolor='rgb(217, 217, 217)',
+        subunitwidth=1,
+        countrywidth=1,
+        subunitcolor="rgb(255, 255, 255)",
+        countrycolor="rgb(255, 255, 255)"
+    )
+)
+
+fig = go.Figure(data=cities, layout=layout)
+# this will plot to your plotly account
+# py.iplot(fig, filename='d3-bubble-map-populations')
+
+# HEAT MAP
+import plotly.graph_objs as go
+import numpy as np
+
+x = np.random.randn(2000)
+y = np.random.randn(2000)
+
+iplot([go.Histogram2dContour(x=x, y=y, contours=dict(coloring='heatmap')),
+      go.Scatter(x=x, y=y, mode='markers', marker=dict(color='white', size=3, opacity=0.3))], show_link=False)
+
+
+from plotly.graph_objs import *
+trace1 = {
+    'lat': list(endangered_languages['Latitude']),
+    'lon': list(endangered_languages['Longitude']),
+    'marker': {
+        'color': np.random.randn(1931), 
+        'colorscale': 'Viridis',
+        'size': list(endangered_languages['Speakers']),
+        'sizemode': 'area',
+        'sizeref': 5000
+    },
+    'text': list(endangered_languages.index.values),
+    'type': 'scattergeo',
+    'uid': '6cf3d0'
+}
+
+data = Data([trace1])
+layout = {
+    'autosize': True,
+    'geo': {
+        'projection': {'type': 'orthographic'},
+        'showcountries': True,
+        'showlakes': True,
+        'showland': True,
+        'showocean': True,
+        'showrivers': True
+    },
+    'height': 741,
+    'hovermode': 'closest',
+    'title': 'Endangered Langagues around the World',
+    'width': 900
+}
+
+fig = Figure(data=data, layout=layout)
+iplot(fig)
