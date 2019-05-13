@@ -1,9 +1,13 @@
 <h1>Endangered Languages Capstone Project 1</h1>
 <h3>Report</h3>
 
+<img align="center" src="https://media.giphy.com/media/pzmbXFDiRbEEk1vCtP/giphy.gif">
+
 <h2 align="center">Problem</h2>
 
-There are many endangered languages in the world today. Many that have already gone extinct. I would like to know what features cause a language to go extinct and to create a machine learning model to predict how likely an endangered language would go extinct. There are many variables to consider when dissecting this problem and I by no means will have a definitive answer once I complete my machine learning model. This problem may not even be a problem which can be solved by machine learning, nonetheless I’d like to state my hypothesis and go over how I wrangled and cleaned the dataset, how I applied some exploratory data analysis along with inferential statistics to further understand the problem. 
+In all seriousness, there are many endangered languages in the world today. Many that have already gone extinct. I would like to know what features cause a language to go extinct and to create a machine learning model to predict how likely an endangered language would go extinct. There are many variables to consider when dissecting this problem and I by no means will have a definitive answer once I complete my machine learning model. This problem may not even be a problem which can be solved by machine learning, nonetheless I’d like to state my hypothesis and go over how I wrangled and cleaned the dataset, how I applied some exploratory data analysis along with inferential statistics to further understand the problem. 
+
+Here's a TLDR link to the [google slides presentation ](https://docs.google.com/presentation/d/1MxG_4JAO5tjp5d2ADxXUuIYpUNWR_-_YsInlD9pk8OA/edit?usp=sharing)
 
 <h2 align="center">Hypothesis</h2>
 
@@ -18,6 +22,8 @@ For this project I was able to find a fairly comprehensive dataset from data.wor
 A lot of this data was in pretty bad shape. Especially the two .csv files I downloaded. For the first from data.world with the endangered languages, the first problem I came across was columns listing what countries the languages were spoken in. In fact there were two columns, one was alpha-3 codes and another country names, both however were stored as strings separated by commas. I decided to use list comprehension on the alpha-3 columns to slice the string and extract just the first (or main) country from the string. I made sure it was the main country because that dataset also had lat and long columns that when plotted on a map, showed the language centered in the first country from the alpha-3 column string. I wanted to have alpha-3 columns in all the datasets to make merging easier, and since the country name column contained the same values just in their long form, I didn’t feel to bad about losing trimming those strings. That dataset also had a bunch of NaN values that I ended up dropping seeing as they represented less than 10% of the data. My mentor, agreed that this would be the best way to handle this situation as backfilling, forward filling or applying the mean of the entire column would lead to biased results. The fertility rate dataset also was problematic because it contained a few countries with entire rows of NaN values for fertility rate. I ended up just dropping these rows because if they didn’t have any data, they wouldn’t be relative to solving my problem. I also had to run some aggregate functions across each row (country) to get the mean, median, max, min and other statistical values over the years of 1960 to 2013. Those statistical values would be much more valuable than just per year fertility rate per country. The two scraped datasets were much less problematic, in fact the one from Wikipedia was really clean and needed minimal processing but the one from the UN suffered from being encoded in unicode. That made the text a bit difficult to parse and I needed to decode it back to utf-8. Once all datasets were cleaned, I was able to merge them into one data frame that included all the features I wanted my model to test
 
 Once all datasets were wrangled and cleaned I began to merge them into one dataframe. This posed its own issues as some values were mishandled ( I only noticed when taking a deeper dive). For instance, when mapping English proficiency scores from scraped data, I realized there were discrepancies in the way the datasets spelled country names. I had to go in latter and manually update values for each country. There were about 12 in total, I also had to do some other processing in which I gave some scores to English speaking countries, like the US, Canada, England, etc.. These countries didn’t take the English proficiency exam because they are native English speaking countries. After discussing with my mentor we came to the conclusion that giving them a rank of 1 (the highest possible) along with scores of 100 which represented a native level of understanding was the best approach here. 
+
+All the cleaning and wrangling python scripts can be found [here](https://github.com/AlexEBall/Endangered_Languages_Capstone_Proj_1/tree/master/data_wrangling)
 
 <h2 align="center">Exploratory Data Analysis and Inferential Statistics</h2>
 
@@ -43,7 +49,11 @@ Finally I thought, it may be worth applying a Chi Squared Test on some of these 
 
 Again, this is an extremely complicated problem and one that machine learning might not be able to solve. The number of possible features to consider is vast and the true data isn’t readily available. I’ve made the best attempt with the data I could find and will continue to process this information and see if my model can’t learn some interesting insights from the data that I wasn’t able to glean. 
 
+Links to the two EDA notebooks found [here](https://github.com/AlexEBall/Endangered_Languages_Capstone_Proj_1/tree/master/statistical_inferences)
+
 <h2 align="center">In-Depth Analysis Using Machine Learning</h2>
+
+The code to the full logistic regression model can be found [here](https://github.com/AlexEBall/Endangered_Languages_Capstone_Proj_1/blob/master/machine_learning_models/Logistic%20Regression%20Model.ipynb)
 
 The problem I tried to tackle was to figure out why languages become extinct. Obviously this problem has many variables and as I wrangled and cleaned the data (from various datasets) I realized that this problem would be hard to translate into a machine learning algorithm. Nonetheless, I thought if I used best practices when preprocessing my data that I would find some interesting patterns or themes underlying the data. Firstly, each observation in the dataset contained a column that listed countries where that language was spoken. On advice from my mentor I hot-encoded that feature. He also advised that I hot-encode the column that assigned a level of endangerment to each language. Once that was completed, the data was ready for machine learning. 
 
@@ -51,7 +61,7 @@ I decided to use multiple logistic regression to tackle this problem because it�
 
 After importing all the necessary modules from pandas, numpy, seaborn and scikit learn. I wanted to get a count of my target variable classes and ran into an issue right from the start. 
 
-<img width="200px" height="200px" src="https://user-images.githubusercontent.com/29084524/57589294-d19c1000-74d6-11e9-9d77-7a02e85d056e.png">
+<img src="https://user-images.githubusercontent.com/29084524/57589294-d19c1000-74d6-11e9-9d77-7a02e85d056e.png">
 
 According the graph, my classes were highly imbalanced. Running logistic regression with this kind of imbalance would result in terrible performance metrics. 
 	
@@ -63,7 +73,47 @@ Repeating the split, train and test process with logistic regression on the down
 
 There are several different scalers available in the scikit learn API and each do scale the data in different ways. I opted with using Robust Scaler which transforms the feature vector by subtracting the median and then dividing by the interquartile range (75% value — 25% value). I mainly used it because it minimizes the effect of outliers. So I scaled the data using Robust Scaler and then downsampled the data as before. Once the data was preprocessed I split, tested and trained my model and lo and behold, the accuracy jumped up to 99% and was now actually predicting both the extinct and non-extinct classes. 
 
+```
+log_reg = LogisticRegression(solver='lbfgs')
 
+scaler = RobustScaler(quantile_range=(25, 75))
+col_names = endangered_languages.columns
+
+col_list = list(col_names)
+col_list.pop(0)
+
+X = endangered_languages.drop(['Language'], axis=1)
+
+scaled_langauges = scaler.fit_transform(X)
+
+scaled_df = pd.DataFrame(scaled_langauges, columns=col_list)
+
+df_majority = scaled_df[scaled_df['Extinct'] == 0]
+df_minority = scaled_df[scaled_df['Extinct'] == 1]
+
+# Downsample majority class
+df_majority_downsampled = resample(df_majority, 
+                                 replace=False,    # sample without replacement
+                                 n_samples=193,     # to match minority class
+                                 random_state=123) # reproducible results
+ 
+# Combine minority class with downsampled majority class
+df_downsampled = pd.concat([df_majority_downsampled, df_minority])
+
+X = df_downsampled.drop(['Extinct'], axis=1)
+y = df_downsampled['Extinct']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=33)
+
+log_reg.fit(X_train, y_train)
+y_pred = log_reg.predict(X_test)
+
+# How many classes is our model predicting?
+print('Clsses Predicted: ', np.unique(y_pred))
+
+# How's our accuracy now?
+print('Accuracty: ', accuracy_score(y_test, y_pred))
+```
 
 | | 1 or Positive Class | 0 or Negative Class |
 |:---:|:---:|:---:|
@@ -72,7 +122,7 @@ There are several different scalers available in the scikit learn API and each d
 
 Looking at the confusion matrix, out of the 49 extinct languages, the classifier correctly predicted all 49 of them. Out of the 67 non-extinct languages, the classifier correctly predicted 66 of them. The logistic regression model only mis-predicted 1 observation. 
 
-<img width="200px" height="200px" src="https://user-images.githubusercontent.com/29084524/57589295-d234a680-74d6-11e9-996f-7c12b9926466.png">
+<img src="https://user-images.githubusercontent.com/29084524/57589295-d234a680-74d6-11e9-996f-7c12b9926466.png">
 
 These initial results seemed too good to be true. The ROC curve to the left looked like an example of what a perfect model would result in. A healthy dose of skepticism in me, lead to further investigation as I didn’t believe this to be a true result. There must be something I overlooked. 
 
